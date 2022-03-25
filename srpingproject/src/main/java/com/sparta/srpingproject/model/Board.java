@@ -1,5 +1,7 @@
-package com.sparta.srpingproject.domain;
+package com.sparta.srpingproject.model;
 
+import com.sparta.srpingproject.utils.Timestamped;
+import com.sparta.srpingproject.dto.BoardRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;

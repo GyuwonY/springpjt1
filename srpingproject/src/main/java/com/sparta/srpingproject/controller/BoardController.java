@@ -1,8 +1,11 @@
 package com.sparta.srpingproject.controller;
 
-import com.sparta.srpingproject.domain.BoardRequestDto;
+import com.sparta.srpingproject.dto.BoardRequestDto;
+import com.sparta.srpingproject.model.UserRoleEnum;
+import com.sparta.srpingproject.security.UserDetailsImpl;
 import com.sparta.srpingproject.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +18,12 @@ public class BoardController
     private final BoardService boardService;
 
     @GetMapping({ "/" })
-    public String boardList(Model model) {
+    public String boardList(Model model, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         model.addAttribute("boards", boardService.list());
+        model.addAttribute("username", userDetails.getUsername());
+        if( userDetails.getUser().getRole() == UserRoleEnum.ADMIN) {
+            model.addAttribute("adminRole", true);
+        }
         return "index";
     }
 

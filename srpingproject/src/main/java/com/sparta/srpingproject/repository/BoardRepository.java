@@ -1,6 +1,8 @@
-package com.sparta.srpingproject.domain;
+package com.sparta.srpingproject.repository;
 
 import java.util.List;
+
+import com.sparta.srpingproject.model.Board;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

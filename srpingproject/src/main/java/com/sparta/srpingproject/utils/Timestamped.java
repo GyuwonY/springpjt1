@@ -1,4 +1,4 @@
-package com.sparta.srpingproject.domain;
+package com.sparta.srpingproject.utils;
 
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.CreatedDate;

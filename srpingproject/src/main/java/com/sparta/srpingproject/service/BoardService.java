@@ -1,9 +1,9 @@
 package com.sparta.srpingproject.service;
 
 import javax.transaction.Transactional;
-import com.sparta.srpingproject.domain.Board;
-import com.sparta.srpingproject.domain.BoardRepository;
-import com.sparta.srpingproject.domain.BoardRequestDto;
+import com.sparta.srpingproject.model.Board;
+import com.sparta.srpingproject.repository.BoardRepository;
+import com.sparta.srpingproject.dto.BoardRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
