@@ -10,12 +10,17 @@
   <link rel="stylesheet" type="text/css" href="/css/style.css">
   <meta charset="UTF-8">
   <title>회원가입 페이지</title>
-  <script>
+  <script th:inline="javascript">
+    let msg = [[${msg}]]
+    if(msg != null) {
+      console.log(msg)
+      alert(msg)
+    }
     function onclickAdmin() {
 // Get the checkbox
-      var checkBox = document.getElementById("admin-check");
+      let checkBox = document.getElementById("admin-check");
 // Get the output text
-      var box = document.getElementById("admin-token");
+      let box = document.getElementById("admin-token");
 
 // If the checkbox is checked, display the output text
       if (checkBox.checked == true){
@@ -31,6 +36,7 @@
   <div id="login-title">Sign up Select Shop</div>
 
   <form action="/user/signup" method="post">
+    <input type="hidden" data-th-name="${ _csrf.parameterName }" data-th-value="${ _csrf.token }">
     <div class="login-id-label">Username</div>
     <input type="text" name="username" placeholder="Username" class="login-input-box">
 

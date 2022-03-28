@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -73,6 +73,7 @@
     <hr>
     <br>
     <form action="/board/form" method="post" name="inputForm" onsubmit="return doWrite()">
+        <input type="hidden" data-th-name="${ _csrf.parameterName }" data-th-value="${ _csrf.token }">
         <!-- onsubmit : 필수 입력 처리 -->
         <table border="1">
             <tr>
@@ -81,7 +82,7 @@
             </tr>
             <tr>
                 <th>작성자</th>
-                <td><input id="name" type="text" name="name"></td>
+                <td><input id="name" type="text" name="name" data-th-value="${ username }" readonly></td>
             </tr>
             <tr>
                 <th>내용</th>

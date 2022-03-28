@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Title</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -39,6 +41,88 @@
         }
 
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:inline="javascript">
+        let token = $("meta[name='_csrf']").attr("content");
+        let header = $("meta[name='_csrf_header']").attr("content");
+        $(document).ready(function (){
+            $.ajax({
+                type: 'GET',
+                contentType: "application/json",
+                url:'/comment',
+                dataType: "json",
+                beforeSend : function(xhr)
+                {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+                    xhr.setRequestHeader(header, token);
+                },
+                success: function(comments){
+                    for(let comment in comments){
+                        let temp_HTML = `<tr>
+                                        <td width="15%" class="title"><strong>${comment.name}</strong></td>
+                                        <td width="70%" class="comment"><div id="id">${comment.comment}</div></td>
+                                        <td class="btns">
+                                            <a class="btn btn-secondary float-end" onclick=deletecomment(${comment.id})>삭제</a>
+                                            <a class="btn btn-secondary float-end" onclick=updatecomment(${comment.id})>수정</a>
+                                        </td>
+                                    </tr>`
+                        ("#comment-list").append(temp_HTML);
+                    }
+                }
+            })
+        })
+
+
+        function deletecomment(id){
+            if(confirm('정말로 삭제하시겠습니까?')){
+                $.ajax({
+                    type: 'DELETE',
+                    contentType: "application/json",
+                    url: '/comment/' + id,
+                    dataType: "json",
+                    beforeSend: function (xhr) {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+                        xhr.setRequestHeader(header, token);
+                    },
+                    success: function () {
+                        alert('삭제가 완료되었습니다.')
+                    }
+                })
+            }
+        }
+
+        function commentCheck(){
+            let username = [[${username}]];
+            if(username == null){
+                if(confirm('로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?')){
+                    location.href = "/user/login"
+                    return false
+                }else{
+                    return false
+                }
+            }else{
+                let comment = $("#comment").text()
+                let boardId = [[${board.id}]]
+                $.ajax({
+                    type: 'POST',
+                    contentType: "application/json",
+                    url: '/comment',
+                    data:{
+                      "username": username,
+                      "comment": comment,
+                      "boardId": boardId
+                    },
+                    dataType: "text",
+                    beforeSend: function (xhr) {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+                        xhr.setRequestHeader(header, token);
+                    },
+                    success: function (msg) {
+                        alert(msg)
+                    }
+                })
+            }
+            return true
+        }
+
+    </script>
 </head>
 <body>
 <div align="center">
@@ -49,9 +133,9 @@
     <table border="1">
         <th:block>
             <tr>
-                <th>번호</th>
+                <th width="15%">번호</th>
                 <td th:utext="${ board.id }"></td>
-                <th>조회수</th>
+                <th width="15%">조회수</th>
                 <td th:utext="${ board.viewCnt }"></td>
             </tr>
             <tr>
@@ -75,8 +159,18 @@
         </th:block>
     </table>
     <br>
-    <a class="btn btn-outline-info" th:href="@{/board/delete/{id}(id=${board.id})}">삭제</a>
+    <a class="btn btn-outline-info" th:href="@{/board/delete/{id}(id=${board.id})}" th:if="${username == board.name}">삭제</a>
     <a class="btn btn-outline-info" href="/">목록</a>
+    <table class="comment-input">
+        <tr>
+            <td width="15%" class="title"><strong>댓글</strong></td>
+            <td class="comments"><textarea style="width:100%;" rows="3" id="comment" placeholder="댓글을 입력하세요."></textarea></td>
+            <td width="8%" class="comment-btn"><a class="btn btn-secondary" onclick="commentCheck()">댓글<br>작성</a></td>
+        </tr>
+    </table>
+    <table class="comment-list">
+
+    </table>
 </div>
 </body>
 </html>
