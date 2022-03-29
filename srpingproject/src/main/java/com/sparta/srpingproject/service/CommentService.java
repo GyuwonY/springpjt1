@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,19 +20,25 @@ public class CommentService {
     }
 
     @Transactional
-    public void registComment(CommentReqeustDto commentRequestDto){
+    public Comment registComment(CommentReqeustDto commentRequestDto){
         Comment comment = new Comment(commentRequestDto);
-        commentRepository.save(comment);
+        return commentRepository.save(comment);
     }
 
     @Transactional
-    public void updateComment(CommentReqeustDto commentReqeustDto){
-        Comment comment = commentRepository.findById(commentReqeustDto.getId()).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+    public void updateComment(Long id, CommentReqeustDto commentReqeustDto){
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
         comment.update(commentReqeustDto.getComment());
     }
 
     @Transactional
-    public void deleteComment(Long id){
+    public Long deleteComment(Long id){
         commentRepository.deleteById(id);
+        return id;
+    }
+
+    @Transactional
+    public Comment commentFindById(Long id){
+        return commentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
     }
 }

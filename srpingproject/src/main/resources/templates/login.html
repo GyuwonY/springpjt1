@@ -33,7 +33,12 @@
     <div id="login-failed" style="display:none" class="alert alert-danger" role="alert">로그인에 실패하였습니다.</div>
 </div>
 </body>
-<script>
+<script th:inline="javascript">
+    let username = [[${username}]]
+    if(username != null){
+        alert("이미 로그인이 되어있습니다.")
+        location.href = "/"
+    }
     const href = location.href;
     const queryString = href.substring(href.indexOf("?")+1)
     if (queryString === 'error') {

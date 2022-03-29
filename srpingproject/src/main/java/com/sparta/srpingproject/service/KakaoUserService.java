@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.srpingproject.dto.KakaoUserInfoDto;
 import com.sparta.srpingproject.model.User;
-import com.sparta.srpingproject.model.UserRoleEnum;
 import com.sparta.srpingproject.repository.UserRepository;
 import com.sparta.srpingproject.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,12 +123,7 @@ public class KakaoUserService {
             String password = UUID.randomUUID().toString();
             String encodedPassword = passwordEncoder.encode(password);
 
-            // email: kakao email
-            String email = kakaoUserInfo.getEmail();
-            // role: 일반 사용자
-            UserRoleEnum role = UserRoleEnum.USER;
-
-            kakaoUser = new User(nickname, encodedPassword, email, role, kakaoId);
+            kakaoUser = new User(nickname, encodedPassword, kakaoId);
             userRepository.save(kakaoUser);
         }
         return kakaoUser;

@@ -5,6 +5,8 @@ import com.sparta.srpingproject.dto.SignupRequestDto;
 import com.sparta.srpingproject.service.KakaoUserService;
 import com.sparta.srpingproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,13 +27,19 @@ public class UserController {
 
     // 회원 로그인 페이지
     @GetMapping("/user/login")
-    public String login() {
+    public String login(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        if(userDetails != null) {
+            model.addAttribute("username", userDetails.getUsername());
+        }
         return "login";
     }
 
     // 회원 가입 페이지
     @GetMapping("/user/signup")
-    public String signup() {
+    public String signup(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        if(userDetails != null) {
+            model.addAttribute("username", userDetails.getUsername());
+        }
         return "signup";
     }
 

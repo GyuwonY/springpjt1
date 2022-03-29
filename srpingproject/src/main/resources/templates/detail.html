@@ -45,27 +45,37 @@
     <script th:inline="javascript">
         let token = $("meta[name='_csrf']").attr("content");
         let header = $("meta[name='_csrf_header']").attr("content");
+        let boardId = [[${board.id}]]
+        let username = [[${username}]]
         $(document).ready(function (){
+            $(document).ajaxSend(function (e, xhr, options){
+                xhr.setRequestHeader(header, token)
+            })
             $.ajax({
                 type: 'GET',
                 contentType: "application/json",
-                url:'/comment',
-                dataType: "json",
-                beforeSend : function(xhr)
-                {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
-                    xhr.setRequestHeader(header, token);
-                },
+                url:'/comment?boardId='+boardId,
                 success: function(comments){
-                    for(let comment in comments){
-                        let temp_HTML = `<tr>
-                                        <td width="15%" class="title"><strong>${comment.name}</strong></td>
-                                        <td width="70%" class="comment"><div id="id">${comment.comment}</div></td>
+                    let temp_HTML = ""
+                    for(let i = 0; i<comments.length; i++){
+                        if(username==comments[i].username) {
+                            temp_HTML = `<tr>
+                                        <td width="15%" class="title"><strong>${comments[i].username}</strong></td>
+                                        <td width="70%" class="comment"><div id="${comments[i].id}"><pre>${comments[i].comment}</pre></div></td>
                                         <td class="btns">
-                                            <a class="btn btn-secondary float-end" onclick=deletecomment(${comment.id})>삭제</a>
-                                            <a class="btn btn-secondary float-end" onclick=updatecomment(${comment.id})>수정</a>
+                                            <a class="btn btn-secondary float-end" onclick=deletecomment(${comments[i].id})>삭제</a>
+                                            <a class="btn btn-secondary float-end" onclick=updatecommentform(${comments[i].id})>수정</a>
                                         </td>
                                     </tr>`
-                        ("#comment-list").append(temp_HTML);
+                        }else{
+                            temp_HTML = `<tr>
+                                        <td width="15%" class="title"><strong>${comments[i].username}</strong></td>
+                                        <td width="70%" class="comment"><div id="id"><pre>${comments[i].comment}</pre></div></td>
+                                        <td class="btns">
+                                        </td>
+                                    </tr>`
+                        }
+                        $("#comment-list").append(temp_HTML);
                     }
                 }
             })
@@ -78,16 +88,17 @@
                     type: 'DELETE',
                     contentType: "application/json",
                     url: '/comment/' + id,
-                    dataType: "json",
                     beforeSend: function (xhr) {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
                         xhr.setRequestHeader(header, token);
                     },
                     success: function () {
-                        alert('삭제가 완료되었습니다.')
+                        alert("댓글이 삭제되었습니다.")
+                        location.reload()
                     }
                 })
             }
         }
+
 
         function commentCheck(){
             let username = [[${username}]];
@@ -99,27 +110,90 @@
                     return false
                 }
             }else{
-                let comment = $("#comment").text()
-                let boardId = [[${board.id}]]
+                let comment = $("#comments").val()
+                if(comment.length==0){
+                    alert("댓글을 입력해주세요.")
+                }else {
+                    $.ajax({
+                        type: 'POST',
+                        contentType: "application/json",
+                        url: '/comment',
+                        data: JSON.stringify({
+                            "username": username,
+                            "comment": comment,
+                            "boardId": boardId
+                        }),
+                        beforeSend: function (xhr) {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+                            xhr.setRequestHeader(header, token);
+                        },
+                        success: function () {
+                            alert("댓글이 작성되었습니다.")
+                            location.reload()
+                        }
+                    })
+                }
+            }
+            return true
+        }
+
+        function deleteboard(){
+            $.ajax({
+                type: 'DELETE',
+                contentType: "application/json",
+                url: '/board/'+boardId,
+                dataType: "text",
+                beforeSend: function (xhr) {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+                    xhr.setRequestHeader(header, token);
+                },
+                success: function (msg) {
+                    location.href="/"
+                }
+            })
+        }
+
+        function updatecommentform(id){
+            $.ajax({
+                type: 'GET',
+                contentType: "application/json",
+                url: '/comment/'+id,
+                beforeSend: function (xhr) {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
+                    xhr.setRequestHeader(header, token);
+                },
+                success: function (comment) {
+                    let contents = comment.comment
+                    let temp_html = `<td id="updateform">
+                                        <textarea style="width:100%;" rows="3" id="updatecomment">${contents}</textarea>
+                                     </td>
+                                     <td>
+                                        <a class="btn btn-secondary" onclick=updatecomment(${id})>수정<br>완료</a>
+                                     </td>`
+                    $("div#"+id).empty()
+                    $("div#"+id).append(temp_html)
+                }
+            })
+        }
+
+        function updatecomment(id){
+            let comment = $("#updatecomment").val()
+            if(comment.length==0){
+                alert("수정할 댓글 내용을 입력해주세요.")
+            }else {
                 $.ajax({
-                    type: 'POST',
+                    type: 'PUT',
                     contentType: "application/json",
-                    url: '/comment',
-                    data:{
-                      "username": username,
-                      "comment": comment,
-                      "boardId": boardId
-                    },
-                    dataType: "text",
+                    url: '/comment/'+id,
+                    data: JSON.stringify({
+                        "comment": comment
+                    }),
                     beforeSend: function (xhr) {   /*데이터를 전송하기 전에 헤더에 csrf값을 설정한다*/
                         xhr.setRequestHeader(header, token);
                     },
-                    success: function (msg) {
-                        alert(msg)
+                    success: function (id) {
+                        alert("댓글 수정이 완료되었습니다.")
+                        location.reload()
                     }
                 })
             }
-            return true
         }
 
     </script>
@@ -159,16 +233,16 @@
         </th:block>
     </table>
     <br>
-    <a class="btn btn-outline-info" th:href="@{/board/delete/{id}(id=${board.id})}" th:if="${username == board.name}">삭제</a>
+    <a class="btn btn-outline-info" th:if="${username == board.name}" onclick="deleteboard()">삭제</a>
     <a class="btn btn-outline-info" href="/">목록</a>
     <table class="comment-input">
         <tr>
             <td width="15%" class="title"><strong>댓글</strong></td>
-            <td class="comments"><textarea style="width:100%;" rows="3" id="comment" placeholder="댓글을 입력하세요."></textarea></td>
+            <td class="comments"><textarea style="width:100%;" rows="3" id="comments" placeholder="댓글을 입력하세요."></textarea></td>
             <td width="8%" class="comment-btn"><a class="btn btn-secondary" onclick="commentCheck()">댓글<br>작성</a></td>
         </tr>
     </table>
-    <table class="comment-list">
+    <table id="comment-list">
 
     </table>
 </div>

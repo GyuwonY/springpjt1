@@ -6,20 +6,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.PrePersist;
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.GenerationType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Entity;
+import javax.persistence.*;
 
 @Entity
 @Getter
 @ToString
 @NoArgsConstructor
+@SequenceGenerator(
+        name="BOARD_SEQ", //시퀀스 제너레이터 이름
+        sequenceName="BOARD_SEQ_NO", //시퀀스 이름
+        initialValue=1, //시작값
+        allocationSize=10 //메모리를 통해 할당할 범위 사이즈
+)
 public class Board extends Timestamped
 {
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE,
+            generator="BOARD_SEQ")
     @Id
     private Long id;
     @Column(nullable = false)

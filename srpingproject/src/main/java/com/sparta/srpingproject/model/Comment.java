@@ -10,8 +10,15 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor
+@SequenceGenerator(
+        name="COMMENT_SEQ", //시퀀스 제너레이터 이름
+        sequenceName="COMMENT_SEQ_NO", //시퀀스 이름
+        initialValue=1, //시작값
+        allocationSize=10 //메모리를 통해 할당할 범위 사이즈
+)
 public class Comment extends Timestamped {
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE,
+            generator="COMMENT_SEQ")
     @Id
     private Long id;
 

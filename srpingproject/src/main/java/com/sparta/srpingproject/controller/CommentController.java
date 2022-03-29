@@ -19,17 +19,24 @@ public class CommentController {
     }
 
     @PostMapping("/comment")
-    public void registComment(@RequestBody CommentReqeustDto commentReqeustDto){
-        commentService.registComment(commentReqeustDto);
+    public Comment registComment(@RequestBody CommentReqeustDto commentReqeustDto){
+        return commentService.registComment(commentReqeustDto);
+    }
+
+    @GetMapping("/comment/{id}")
+    public Comment commentFindById(@PathVariable Long id){
+        return commentService.commentFindById(id);
     }
 
     @DeleteMapping("/comment/{id}")
-    public void deleteComment(@PathVariable Long id){
-        commentService.deleteComment(id);
+    public Long deleteComment(@PathVariable Long id){
+        return commentService.deleteComment(id);
     }
 
-    @PutMapping("/comment")
-    public void updateComment(@RequestBody CommentReqeustDto commentReqeustDto){
-        commentService.updateComment(commentReqeustDto);
+    @PutMapping("/comment/{id}")
+    public Long updateComment(@PathVariable Long id, @RequestBody CommentReqeustDto commentReqeustDto){
+        System.out.println(commentReqeustDto);
+        commentService.updateComment(id, commentReqeustDto);
+        return commentReqeustDto.getId();
     }
 }
